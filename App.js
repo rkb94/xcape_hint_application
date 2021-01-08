@@ -1,30 +1,28 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, ScrollView, StatusBar} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import HintHome from './src/HintHome';
 
 const App: () => React$Node = () => {
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <HintHome 
-            theme= "501동 사람들"
-          />
-        </ScrollView>
-      </SafeAreaView>
-    </>
+    <View style={styles.container}>
+      <HintHome 
+        theme= "501동 사람들"
+        style={styles.hintHome}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container: {
+    flex: 1,
+    flexDirection: 'column'
   },
+  hintHome: {
+    flex: 1,
+    backgroundColor: 'red',
+  }
 });
 
 export default App;
