@@ -1,7 +1,10 @@
 import React from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, ImageBackground, StyleSheet, Text} from 'react-native';
 import {Header, Icon} from 'react-native-elements';
 import HintSearch from './HintSearch';
+import HintView from './HintView';
+
+const image = '../assets/main_bg.jpg';
 
 const HintHome = (props) => {
   return (
@@ -13,7 +16,13 @@ const HintHome = (props) => {
         rightComponent={{icon: 'home', color: '#fff'}}
         containerStyle={{backgroundColor: '#151515'}}
       />
-      <HintSearch style={styles.hintSearch} />
+      <ImageBackground
+        source={require(image)}
+        style={styles.imageBackgroundContainer}
+        resizeMode="stretch">
+        <HintSearch style={styles.hintSearch} />
+        <HintView style={styles.hintView} />
+      </ImageBackground>
     </View>
   );
 };
@@ -22,14 +31,15 @@ const styles = StyleSheet.create({
   centerComponent: {
     color: 'white',
     fontSize: 19,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+  },
+  imageBackgroundContainer: {
+    flex: 1,
+    flexDirection: 'column'
   },
   hintHomeContainer: {
     flex: 1,
     flexDirection: 'column',
-  },
-  hintSearch: {
-    flex: 1,
   },
 });
 
