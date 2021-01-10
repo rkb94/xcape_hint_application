@@ -1,15 +1,10 @@
 import React from 'react';
 import {Icon} from 'react-native-elements';
-import {
-  View,
-  StyleSheet,
-  TextInput,
-  TouchableHighlight,
-} from 'react-native';
+import {View, StyleSheet, TextInput, TouchableHighlight, Vibration} from 'react-native';
 
 const HintSearch = () => {
   const searchHint = (e) => {
-      alert("test");
+    Vibration.vibrate(8);
   };
   return (
     <View style={styles.hintSearchContainerWrapper}>
@@ -23,12 +18,15 @@ const HintSearch = () => {
         />
         <TouchableHighlight
           style={styles.hintInputButtonTouchableOpacity}
-          onPress={searchHint}>
+          onPress={searchHint}
+          activeOpacity={0.6}
+          underlayColor="#B7A202"
+        >
           <Icon
             style={styles.hintInputButtonIcon}
             name="search"
-            size={30}
-            color="white"
+            size={33}
+            color="black"
           />
         </TouchableHighlight>
       </View>
@@ -44,35 +42,38 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   hintSearchContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    height: '50%',
+    width: '80%',
+    height: '75%',
+    marginTop: '5%',
+    borderColor: '#dbc202',
+    borderWidth: 2,
+    borderRadius: 100,
+    backgroundColor: 'black',
   },
   hintTextInput: {
     backgroundColor: 'black',
     color: 'white',
-    height: '120%',
-    borderColor: '#dbc202',
-    borderWidth: 2,
-    borderRadius: 15,
+    height: '100%',
     fontSize: 25,
     fontWeight: 'bold',
     textAlign: 'center',
-    width: '70%',
+    flex: 4,
+    borderRadius: 100,
   },
-  hintInputButtonIcon: {
-    height: '60%',
-    width: '100%'
-  },
+  hintInputButtonIcon: {},
   hintInputButtonTouchableOpacity: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '120%',
-    width: '13%',
-    borderRadius: 50
+    flex: 1,
+    backgroundColor: '#dbc202',
+    borderTopRightRadius: 50,
+    borderBottomRightRadius: 50,
   },
 });
 
