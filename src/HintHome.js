@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, ImageBackground, StyleSheet, Text} from 'react-native';
-import {Header, Icon} from 'react-native-elements';
+import {Header} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/Ionicons'
 import HintSearch from './HintSearch';
 import HintView from './HintView';
 
@@ -11,7 +12,7 @@ const HintHome = (props) => {
     <View style={styles.hintHomeContainer}>
       <Header
         statusBarProps={{hidden: true}}
-        leftComponent={<Icon name="settings" color="#fff" />}
+        leftComponent={<Icon name="settings-outline" size={25} color="#fff" />}
         centerComponent={{text: props.theme, style: styles.centerComponent}}
         rightComponent={{icon: 'home', color: '#fff'}}
         containerStyle={{backgroundColor: '#151515'}}
@@ -30,7 +31,7 @@ const HintHome = (props) => {
 const styles = StyleSheet.create({
   centerComponent: {
     color: 'white',
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   imageBackgroundContainer: {

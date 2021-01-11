@@ -1,11 +1,45 @@
-import React from 'react'
-import { View, Text, StyleSheet, TextInput } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableHighlight, Vibration } from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
 
-const HintContent = () => {
+const HintContent = (props) => {
+    const [viewAble, setViewAble] = useState(props.viewAble);
+
+    function show() {
+        Vibration.vibrate(8);
+        setViewAble(!viewAble);
+    }
+
     return (
         <View style={styles.hintContent}>
-            <Text style={styles.hintContentHeader}>test</Text>
-            <TextInput style={styles.hintContentInput}></TextInput>
+            <View style={styles.hintContentHeaderWrapper}>
+                <Text style={styles.hintContentHeader}>
+                    {props.role}
+                </Text>
+            </View>
+            <View style={styles.hintContentWrapper}>
+                {viewAble ?
+                    <ScrollView style={styles.hintContentScrollView}>
+                        <Text style={styles.hintContentValue}>
+                            {props.hintContent}
+                        </Text>
+                    </ScrollView>
+                    :
+                    <TouchableHighlight 
+                        style={styles.hintContentLockWrapper}
+                        onPress={show}
+                        activeOpacity={0.6}
+                        underlayColor="dimgrey"
+                    >
+                        <View style={styles.hintContentLockWrapper}>
+                            <Icon name="lock-closed-outline" size={35} color="#fff" />
+                            <Text style={styles.hintContentLock}>
+                                터치하면 정답이 나타납니다.
+                            </Text>
+                        </View>
+                    </TouchableHighlight>
+                }
+            </View>
         </View>
     )
 }
@@ -17,21 +51,43 @@ const styles = StyleSheet.create({
         marginStart: '5%',
         marginEnd: '5%',
     },
-    hintContentHeader: {
+    hintContentHeaderWrapper: {
         color: 'black',
         backgroundColor: '#dbc202',
         flex: 1,
-        fontSize: 18,
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
     },
-    hintContentInput: {
-        color: 'white',
+    hintContentHeader: {
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    hintContentWrapper: {
         backgroundColor: 'black',
         flex: 7,
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
+    },
+    hintContentScrollView: {
+        margin: '3%'
+    },
+    hintContentValue: {
+        flex: 1,
+        fontSize: 15,
+        color: 'white'
+    },
+    hintContentLock: {
+        color: 'white',
+        marginTop: '2%'
+    },
+    hintContentLockWrapper: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
         borderBottomLeftRadius: 15,
         borderBottomRightRadius: 15,
     }
