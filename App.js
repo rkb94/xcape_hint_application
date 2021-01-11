@@ -1,28 +1,35 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import HintHome from './src/HintHome';
+import HintSetting from './src/HintSetting';
 
-const App: () => React$Node = () => {
+const Stack = createStackNavigator();
+
+const App: () => React$Node = ({navigation}) => {
   return (
-    <View style={styles.container}>
-      <HintHome 
-        theme= "501동 사람들"
-        style={styles.hintHome}
-      />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="HintHome"
+        screenOptions={{
+          headerShown: false
+        }}
+      >
+        <Stack.Screen 
+          name="HintHome" 
+          component={HintHome}
+          options={{
+            navigation: navigation
+          }}
+        />
+        <Stack.Screen
+          name="HintSetting"
+          component={HintSetting}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column'
-  },
-  hintHome: {
-    flex: 1,
-    backgroundColor: 'red',
-  }
-});
 
 export default App;
