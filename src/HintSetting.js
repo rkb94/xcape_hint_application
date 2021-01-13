@@ -7,43 +7,86 @@ import {
   Button,
   Vibration,
   TouchableHighlight,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Header} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const image = '../assets/main_bg.jpg';
-const defaultMerchant = '';
-const defaultTheme = '';
 
 const HintSetting = (props) => {
   const [merchantList, setMerchantList] = useState([]);
-//   const [selectedMerchant, setSelectedMerchant] = useState(defaultMerchant);
-//   const [selectedTheme, setSelectedTheme] = useState(defaultTheme);
-  const [state, setState] = useState({
-    selectedMerchant: '',
-    selectedTheme: ''
-  });
+  const [themeList, setThemeList] = useState([]);
+  const [selectedMerchant, setSelectedMerchant] = useState();
+  const [selectedTheme, setSelectedTheme] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getHintList();
-  },[merchantList]);
+    getMerchantList();
+    setAsyncStorage();
+  }, []);
 
-  function getHintList() {
-    firestore()
+  useEffect(() => {
+    getThemeList();
+  }, [selectedMerchant]);
+
+  const setAsyncStorage = async () => {
+    try {
+      setSelectedMerchant(await AsyncStorage.getItem('merchant'));
+      setSelectedTheme(await AsyncStorage.getItem('theme'));
+    } catch (error) {
+      console.log('Not storage...');
+    }
+  };
+
+  const getMerchantList = () => {
+    setLoading(true);
+    return firestore()
       .collection('xcape')
-      .onSnapshot(merchantList => {
-        setMerchantList(
-          merchantList.docs.map(merchant => merchant.id)
-        );
+      .get()
+      .then((merchantList) => {
+        setMerchantList(merchantList.docs.map((merchant) => merchant.id));
       });
-  }
+  };
 
-  function showMerchantList() {
-      console.log(merchantList);
-      console.log(state)
-  }
+  const getThemeList = () => {
+    return firestore()
+      .collection('xcape')
+      .doc(selectedMerchant)
+      .collection('테마')
+      .get()
+      .then((themeList) => {
+        setThemeList(themeList.docs.map((theme) => theme.id));
+        setLoading(false);
+      });
+  };
+
+  const goBackHintHome = async () => {
+    Vibration.vibrate(6);
+    await storeData(selectedMerchant, selectedTheme);
+    props.navigation.navigate('HintHome', {
+      merchant: selectedMerchant,
+      theme: selectedTheme,
+    });
+  };
+
+  const storeData = async (merchant, theme) => {
+    try {
+      await AsyncStorage.setItem('merchant', merchant);
+      await AsyncStorage.setItem('theme', theme);
+      console.log(
+        'Store success merchant: ' +
+          (await AsyncStorage.getItem('merchant')) +
+          '/' +
+          (await AsyncStorage.getItem('theme')),
+      );
+    } catch (e) {
+      console.log('Store Error!!');
+    }
+  };
 
   return (
     <ImageBackground
@@ -52,18 +95,15 @@ const HintSetting = (props) => {
       resizeMode="stretch">
       <Header
         statusBarProps={{hidden: true}}
-        leftComponent={
-          <TouchableHighlight
-            style={styles.headerButton}
-            onPress={() => {
-              Vibration.vibrate(8);
-              props.navigation.navigate('HintHome');
-            }}
-            activeOpacity={0.6}
-            underlayColor="dimgrey">
-            <Icon name="home-outline" size={25} color="#fff" />
-          </TouchableHighlight>
-        }
+        // leftComponent={
+        //   <TouchableHighlight
+        //     style={styles.headerButton}
+        //     onPress={goBackHintHome}
+        //     activeOpacity={0.6}
+        //     underlayColor="dimgrey">
+        //     <Icon name="home-outline" size={25} color="#fff" />
+        //   </TouchableHighlight>
+        // }
         centerComponent={<Text style={styles.centerComponent}>힌트 설정</Text>}
         containerStyle={styles.headerStyle}
       />
@@ -77,29 +117,41 @@ const HintSetting = (props) => {
           <View style={styles.hintSettingPickerWrapper}>
             <Text style={styles.hintSettingPickerTitle}>지점</Text>
             <Picker
-              selectedValue={state.selectedMerchant}
+              selectedValue={selectedMerchant}
               style={styles.hintSettingSectionPicker}
-              onValueChange={(itemValue, itemIndex) =>
-                setState({selectedMerchant: itemValue})
-              }>
-                  {merchantList.map(merchant => {
-                      return (<Picker.Item label={merchant} value={merchant} key={merchant}/>)
-                    })
-                  }
+              onValueChange={(itemValue, itemIndex) => {
+                Vibration.vibrate(6);
+                setSelectedMerchant(itemValue);
+              }}>
+              {merchantList.map((merchant) => {
+                return (
+                  <Picker.Item
+                    label={merchant}
+                    value={merchant}
+                    key={merchant}
+                  />
+                );
+              })}
             </Picker>
           </View>
           <View style={styles.hintSettingPickerWrapper}>
             <Text style={styles.hintSettingPickerTitle}>테마</Text>
             <Picker
-              selectedValue={state.language}
+              selectedValue={selectedTheme}
               style={styles.hintSettingSectionPicker}
               itemStyle={styles.hintSettingPickerItem}
-            //   onValueChange={(itemValue, itemIndex) =>
-            //     setState({language: itemValue})
-            //   }
-            >
-              <Picker.Item label="Java" value="java" />
-              <Picker.Item label="JavaScript" value="js" />
+              onValueChange={(itemValue) => {
+                Vibration.vibrate(6);
+                setSelectedTheme(itemValue);
+              }}>
+              <Picker.Item
+                label="===== 테마를 설정해주세요. ======"
+                value="테마를 설정해주세요."
+                key="테마를 설정해주세요."
+              />
+              {themeList.map((theme) => {
+                return <Picker.Item label={theme} value={theme} key={theme} />;
+              })}
             </Picker>
           </View>
         </View>
@@ -113,18 +165,16 @@ const HintSetting = (props) => {
         <View style={styles.hintSettingContentWrapper}></View>
       </View>
       <View style={styles.hintSettingButtonWrapper}>
-        <Button
-          style={styles.hintSettingButton}
-          color="#dbc202"
-          onPress={getHintList}
-          title="설정 완료"
-        />
-        <Button
-          style={styles.hintSettingButton}
-          color="#dbc202"
-          onPress={showMerchantList}
-          title="View"
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#dbc202" />
+        ) : (
+          <Button
+            style={styles.hintSettingButton}
+            color="#dbc202"
+            onPress={goBackHintHome}
+            title="설정 완료"
+          />
+        )}
       </View>
     </ImageBackground>
   );
@@ -204,6 +254,13 @@ const styles = StyleSheet.create({
   },
   hintSettingPickerItem: {
     textAlign: 'right',
+  },
+  hintSettingLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
   },
 });
 

@@ -1,13 +1,39 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, ImageBackground, StyleSheet, TouchableHighlight, Vibration, Text} from 'react-native';
 import {Header} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons'
 import HintSearch from './HintSearch';
 import HintView from './HintView';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const image = '../assets/main_bg.jpg';
 
 const HintHome = (props) => {
+  const [merchant, setMerchant] = useState();
+  const [theme, setTheme] = useState();
+
+  useEffect(() => {
+    const refresh = props.navigation.addListener('focus', () => {
+      console.log("refresh");
+      getStoreDate();
+      getMerchant();
+    })
+    return refresh;
+  }, [merchant, theme, props.navigation])
+  
+  const getStoreDate = async () => {
+    try {
+      setMerchant(await AsyncStorage.getItem('merchant'));
+      setTheme(await AsyncStorage.getItem('theme'));
+    } catch (error) {
+      console.log('Not storage...');
+    }
+  }
+  
+  const getMerchant = () => {
+    console.log("지점: " + merchant + ", 테마: " + theme);
+  }
+
   return (
     <View style={styles.hintHomeContainer}>
       <Header
@@ -16,7 +42,7 @@ const HintHome = (props) => {
           <TouchableHighlight
             style={styles.hintSettingButton}
             onPress={() => {
-              Vibration.vibrate(8)
+              Vibration.vibrate(6)
               props.navigation.navigate('HintSetting')
             }}
             activeOpacity={0.6}
@@ -27,10 +53,18 @@ const HintHome = (props) => {
         }
         centerComponent={
           <Text style={styles.centerComponent}>
-            501동 사람들
+            {theme}
           </Text>
         }
-        // rightComponent={{icon: 'home', color: '#fff'}}
+        rightComponent={
+          <TouchableHighlight
+            style={styles.hintSettingButton}
+            onPress={getMerchant}
+            activeOpacity={0.6}
+            underlayColor="dimgrey"
+          >
+            <Icon name="home-outline" size={25} color="#fff" />
+          </TouchableHighlight>}
         containerStyle={styles.headerStyle}
       />
       <ImageBackground

@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import androidx.multidex.MultiDexApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -30,6 +31,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           packages.add(new RNCPickerPackage());
+          // packages.add(new AsyncStoragePackage());
           return packages;
         }
 
