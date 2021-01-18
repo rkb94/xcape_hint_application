@@ -64,7 +64,7 @@ const HintSearch = (props) => {
       props.setHintAndAnswer(hintMessage.message1, hintMessage.message2);
       if (hintMessage.seq != hintSeq) {
         setHintSeq(hintMessage.seq);
-        // props.plusHintUseCount();
+        props.plusHintUseCount();
         Keyboard.dismiss();
       }
     } catch (e) {

@@ -6,10 +6,10 @@ import {
   StyleSheet,
   Button,
   Vibration,
-  TouchableHighlight,
   ActivityIndicator,
+  Alert,
+  Linking
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {Header} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
@@ -23,9 +23,13 @@ const HintSetting = (props) => {
   const [selectedMerchant, setSelectedMerchant] = useState();
   const [selectedTheme, setSelectedTheme] = useState();
   const [loading, setLoading] = useState(false);
+  const [isUpdatable, setIsUpdateable] = useState(false);
+  const [updateLink, setUpdateLink] = useState();
+  const [version, setVersion] = useState("1.1");
 
   useEffect(() => {
     getMerchantList();
+    getVersionInfo();
     setAsyncStorage();
   }, []);
 
@@ -68,8 +72,7 @@ const HintSetting = (props) => {
     Vibration.vibrate(6);
     await storeData(selectedMerchant, selectedTheme);
     props.navigation.navigate('HintHome', {
-      merchant: selectedMerchant,
-      theme: selectedTheme,
+      isForSetting: true,
     });
   };
 
@@ -77,6 +80,7 @@ const HintSetting = (props) => {
     try {
       await AsyncStorage.setItem('merchant', merchant);
       await AsyncStorage.setItem('theme', theme);
+      await AsyncStorage.setItem('hintCount', JSON.stringify(0));
       console.log(
         'Store success merchant: ' +
           (await AsyncStorage.getItem('merchant')) +
@@ -88,6 +92,24 @@ const HintSetting = (props) => {
     }
   };
 
+  const getVersionInfo = () => {
+    return firestore()
+    .collection('update')
+    .doc('info')
+    .get()
+    .then((info) => {
+        if (version != info.data().version) {
+            setIsUpdateable(true);
+            setUpdateLink(info.data().link);
+            setVersion(info.data().version);
+        }
+    });
+  }
+
+  const openUpdateVersion = () => {
+    Linking.openURL(updateLink);
+  }
+
   return (
     <ImageBackground
       source={require(image)}
@@ -95,15 +117,6 @@ const HintSetting = (props) => {
       resizeMode="stretch">
       <Header
         statusBarProps={{hidden: true}}
-        // leftComponent={
-        //   <TouchableHighlight
-        //     style={styles.headerButton}
-        //     onPress={goBackHintHome}
-        //     activeOpacity={0.6}
-        //     underlayColor="dimgrey">
-        //     <Icon name="home-outline" size={25} color="#fff" />
-        //   </TouchableHighlight>
-        // }
         centerComponent={<Text style={styles.centerComponent}>힌트 설정</Text>}
         containerStyle={styles.headerStyle}
       />
@@ -162,7 +175,16 @@ const HintSetting = (props) => {
             XCAPE 힌트 애플리케이션 업데이트
           </Text>
         </View>
-        <View style={styles.hintSettingContentWrapper}></View>
+        <View style={styles.hintSettingContentWrapper}>
+            <View style={styles.hintSettingVersionWrapper}>
+                <Button 
+                    style={styles.hintSettingVersionButton}
+                    title={isUpdatable ? version + "V 버전 업데이트가 필요합니다." : "현재 " + version + "V 최신 버전입니다."} 
+                    onPress={openUpdateVersion}
+                    disabled={!isUpdatable}
+                />
+            </View>
+        </View>
       </View>
       <View style={styles.hintSettingButtonWrapper}>
         {loading ? (
@@ -262,6 +284,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10,
   },
+  hintSettingVersionWrapper: {
+    flexDirection: 'column',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hintSettingVersionText: {
+      flex: 1,
+      color: 'lightgrey',
+      fontSize: 20,
+      fontWeight: 'bold',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  hintSettingVersionButton: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+  }
 });
 
 export default HintSetting;

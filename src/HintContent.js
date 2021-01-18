@@ -5,6 +5,12 @@ import Icon from 'react-native-vector-icons/Ionicons'
 const HintContent = (props) => {
     const [viewAble, setViewAble] = useState(props.viewAble);
 
+    useEffect(() => {
+        if(props.role == "정답") {
+            setViewAble(false);
+        }
+    }, [props.hintContent])
+
     function show() {
         Vibration.vibrate(8);
         setViewAble(!viewAble);
@@ -76,7 +82,7 @@ const styles = StyleSheet.create({
     },
     hintContentValue: {
         flex: 1,
-        fontSize: 15,
+        fontSize: 17,
         color: 'white'
     },
     hintContentLock: {
