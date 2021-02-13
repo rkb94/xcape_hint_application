@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableHighlight, Vibration } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableHighlight, Vibration, Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 const HintContent = (props) => {
@@ -13,7 +13,30 @@ const HintContent = (props) => {
 
     function show() {
         Vibration.vibrate(8);
-        setViewAble(!viewAble);
+        Alert.alert(
+          '지금 바로 정답을 확인하시겠습니까?',
+          '',
+          [
+            {
+              text: '좀 더 고민해 본다',
+              onPress: () => {
+                  Vibration.vibrate(8);
+                  console.log('Cancel Pressed');
+                },
+              style: 'cancel'
+            },
+            { 
+                text: '정답을 바로 본다', 
+                onPress: () => {
+                    Vibration.vibrate(8);
+                    console.log('OK Pressed')
+                    setViewAble(!viewAble);
+                },
+                style: 'destructive'
+            }
+          ],
+          { cancelable: false }
+        );
     }
 
     return (

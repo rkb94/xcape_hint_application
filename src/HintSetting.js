@@ -8,7 +8,8 @@ import {
   Vibration,
   ActivityIndicator,
   Alert,
-  Linking
+  Linking,
+  ToastAndroid
 } from 'react-native';
 import {Header} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
@@ -25,16 +26,26 @@ const HintSetting = (props) => {
   const [loading, setLoading] = useState(false);
   const [isUpdatable, setIsUpdateable] = useState(false);
   const [updateLink, setUpdateLink] = useState();
-  const [version, setVersion] = useState("1.1");
+  const [version, setVersion] = useState("1.2");
 
   useEffect(() => {
-    getMerchantList();
-    getVersionInfo();
-    setAsyncStorage();
+    try {
+      getMerchantList();
+      getVersionInfo();
+      setAsyncStorage();
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.showWithGravity("힌트가 초기화 되었습니다.", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    }
   }, []);
 
   useEffect(() => {
-    getThemeList();
+    try {
+      getThemeList();
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.showWithGravity("힌트가 초기화 되었습니다.", ToastAndroid.SHORT, ToastAndroid.CENTER);
+    }
   }, [selectedMerchant]);
 
   const setAsyncStorage = async () => {

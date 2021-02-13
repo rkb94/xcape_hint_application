@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   ImageBackground,
@@ -7,6 +7,7 @@ import {
   Vibration,
   Text,
   Alert,
+  ToastAndroid
 } from 'react-native';
 import {Header} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,6 +26,9 @@ const HintHome = ({navigation}) => {
   const [hint, setHint] = useState();
   const [answer, setAnswer] = useState();
   const [hintCount, setHintCount] = useState(0);
+  const [defaultInput, setDefaultInput] = useState(0);
+
+  const childRef = useRef();
 
   useEffect(() => {
     SplashScreen.hide();
@@ -51,7 +55,11 @@ const HintHome = ({navigation}) => {
   const getHintCount = async () => {
     try {
       let storageHintCount = await AsyncStorage.getItem('hintCount');
-      setHintCount(Number(storageHintCount));
+      if (isNaN(Number(storageHintCount))) {
+        setHintCount(0);
+      } else {
+        setHintCount(Number(storageHintCount));
+      }
     } catch (error) {
       console.log('Not hintCount...' + error);
       setHintCount(0);
@@ -81,6 +89,42 @@ const HintHome = ({navigation}) => {
           text: 'Cancel',
           onPress: () => {
             Vibration.vibrate(6);
+            console.log('Cancel Pressed');
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: (password) => {
+            Vibration.vibrate(6);
+            console.log('OK Pressed, password: ' + password);
+            if (password == '5772') {
+              navigation.navigate('HintSetting');
+            } else {
+              Alert.alert('잘못된 입력입니다.');
+            }
+          },
+        },
+      ],
+      {
+        type: 'secure-text',
+        cancelable: false,
+        defaultValue: '',
+        placeholder: '* * * *',
+      },
+    );
+  };
+
+  const resetHintCount = () => {
+    Vibration.vibrate(6);
+    prompt(
+      '관리자 비밀번호를 입력해주세요.',
+      '',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            Vibration.vibrate(6);
             console.log('Cancel Pressed')
           },
           style: 'cancel',
@@ -91,9 +135,13 @@ const HintHome = ({navigation}) => {
             Vibration.vibrate(6);
             console.log('OK Pressed, password: ' + password)
             if (password == "5772") {
-              navigation.navigate('HintSetting');
+                AsyncStorage.setItem('hintCount', JSON.stringify("0"));
+                setHintCount(0);
+                setHintAndAnswer("", "");
+                childRef.current.resetInput();
+                ToastAndroid.showWithGravity("힌트가 초기화 되었습니다.", ToastAndroid.SHORT, ToastAndroid.CENTER);
             } else {
-              Alert.alert("잘못된 입력입니다.");
+                Alert.alert("잘못된 입력입니다.");
             }
           },
         },
@@ -115,14 +163,13 @@ const HintHome = ({navigation}) => {
           <TouchableHighlight
             style={styles.hintSettingButton}
             onPress={settingPrompt}
-            // navigation.navigate('HintSetting');
             activeOpacity={0.6}
             underlayColor="dimgrey">
             <Icon name="settings-outline" size={25} color="#fff" />
           </TouchableHighlight>
         }
         centerComponent={<Text style={styles.centerComponent}>{theme}</Text>}
-        rightComponent={<HintCount hintCount={hintCount} />}
+        rightComponent={<HintCount hintCount={hintCount} resetHintCount={resetHintCount}/>}
         containerStyle={styles.headerStyle}
       />
       <ImageBackground
@@ -131,6 +178,7 @@ const HintHome = ({navigation}) => {
         resizeMode="stretch">
         <HintSearch
           style={styles.hintSearch}
+          ref={childRef}
           merchant={merchant}
           theme={theme}
           navigation={navigation}

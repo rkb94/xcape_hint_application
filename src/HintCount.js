@@ -1,10 +1,15 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 
 const HintCount = (props) => {
     return (
         <View style={styles.hintCountContainer}>
-            <Text style={styles.hintCount}>{props.hintCount}</Text>
+            <TouchableHighlight 
+                style={styles.hintCountWrapperButton}
+                onLongPress={props.resetHintCount}
+            >
+                <Text style={styles.hintCount}>{props.hintCount}</Text>
+            </TouchableHighlight>
             <Text style={styles.hintCountText}>HINT COUNT</Text>
         </View>
     )
@@ -16,11 +21,15 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginRight: '10%'
     },
+    hintCountWrapperButton: {
+        flex: 3,
+        borderRadius: 50
+    },
     hintCount: {
         color: 'white',
         fontSize: 35,
         textAlign: 'center',
-        flex: 3,
+        flex: 1,
         fontWeight: 'bold'
     },
     hintCountText: {
@@ -28,7 +37,7 @@ const styles = StyleSheet.create({
         fontSize: 8,
         textAlign: 'center',
         flex: 1,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     }
 })
 

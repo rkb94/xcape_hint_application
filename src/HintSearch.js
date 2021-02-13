@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
 import {Icon} from 'react-native-elements';
 import {
   View,
@@ -11,13 +11,14 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
-const HintSearch = (props) => {
+const HintSearch = forwardRef((props, ref) => {
   const [hintList, setHintList] = useState([]);
   const [hintSeq, setHintSeq] = useState('');
   const [input, setInput] = useState('');
   const [selectMerchant, setSelectMerchant] = useState('');
   const [selectThmem, setSelectTheme] = useState('');
-
+  const [defaultInput, setDefaultInput] = useState(props.resetInput);
+  
   useEffect(() => {
     if (props.merchant == undefined || props.theme == undefined) {
       setSelectMerchant('');
@@ -41,6 +42,26 @@ const HintSearch = (props) => {
   useEffect(() => {
     props.navigation;
   });
+
+
+  useImperativeHandle(ref, () => ({
+
+    resetInput() {
+      setInput("");
+    }
+
+  }));
+
+  // useState(() => {
+  //   console.log("props Input In HintSearch!!!!!: " + props.resetInput);
+  //   setDefaultInput(props.resetInput);
+  //   setInput("");
+  //   console.log("Input: " + input);
+  //   // if (defaultInput != props.resetInput) {
+  //   //   console.log("props Input!!!!!: " + props.resetInput);
+  //   //   setInput('');
+  //   // }
+  // }, [props.resetInput]);
 
   function getHintList(merchant, theme) {
     firestore()
@@ -95,7 +116,6 @@ const HintSearch = (props) => {
           onChangeText={(text) => setInput(convertToUpperCase(text))}
           value={input}
           autoCapitalize="characters"
-          // onSubmitEditing={searchHint}
         />
         <TouchableHighlight
           style={styles.hintInputButtonTouchableOpacity}
@@ -112,7 +132,7 @@ const HintSearch = (props) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   whiteColor: {
